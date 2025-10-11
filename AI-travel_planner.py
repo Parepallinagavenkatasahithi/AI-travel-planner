@@ -1,14 +1,4 @@
 import streamlit as st
-
-# ------------------- Page setup -------------------
-if not st.session_state.get("page_configured", False):
-    st.set_page_config(
-        page_title="AI Travel Planner for Students",
-        page_icon="🎒",
-        layout="wide"
-    )
-    st.session_state["page_configured"] = True
-
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
@@ -17,6 +7,18 @@ from pathlib import Path
 import os
 import openai
 
+# ======================================================================================
+# SAFE PAGE CONFIG (works on Streamlit Cloud reloads)
+# ======================================================================================
+if "page_configured" not in st.session_state:
+    st.set_page_config(
+        page_title="AI Travel Planner for Students",
+        page_icon="🎒",
+        layout="wide"
+    )
+    st.session_state["page_configured"] = True
+# ======================================================================================
+
 # ------------------- Load environment variables -------------------
 dotenv_path = Path(__file__).parent / ".env"
 if dotenv_path.exists():
@@ -24,7 +26,6 @@ if dotenv_path.exists():
     st.info("✅ Loaded local .env file.")
 else:
     st.info("☁️ Using Streamlit Cloud secrets (no local .env found).")
-
 
 # Load keys from environment or Streamlit secrets
 OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
@@ -36,10 +37,10 @@ if not OPENAI_KEY:
 
 openai.api_key = OPENAI_KEY
 
-# ------------------- Page setup -------------------
-st.set_page_config(page_title="AI Travel Planner for Students", page_icon="🎒", layout="wide")
+# ------------------- App Header -------------------
 st.title("🎒 AI Travel Planner for Students")
 st.caption("Plan efficient, budget-friendly trips with AI-powered itineraries — perfect for students!")
+
 
 # ------------------- Sidebar inputs -------------------
 with st.sidebar:
