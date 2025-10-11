@@ -1,0 +1,15 @@
+# Ignore environment and sensitive files
+.env
+
+# Python cache & temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment folders
+venv/
+env/
+
+# Streamlit & config files
+.streamlit/
