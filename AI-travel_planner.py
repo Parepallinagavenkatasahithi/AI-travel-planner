@@ -1,4 +1,14 @@
 import streamlit as st
+
+# ------------------- Page setup -------------------
+if not st.session_state.get("page_configured", False):
+    st.set_page_config(
+        page_title="AI Travel Planner for Students",
+        page_icon="🎒",
+        layout="wide"
+    )
+    st.session_state["page_configured"] = True
+
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
@@ -14,6 +24,7 @@ if dotenv_path.exists():
     st.info("✅ Loaded local .env file.")
 else:
     st.info("☁️ Using Streamlit Cloud secrets (no local .env found).")
+
 
 # Load keys from environment or Streamlit secrets
 OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
