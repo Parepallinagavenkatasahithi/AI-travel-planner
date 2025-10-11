@@ -7,18 +7,20 @@ from pathlib import Path
 import os
 import openai
 
-# ------------------- Load .env -------------------
+# ------------------- Load environment variables -------------------
 dotenv_path = Path(__file__).parent / ".env"
-if not dotenv_path.exists():
-    st.error("⚠️ .env file not found! Place .env in the same folder as this script.")
-    st.stop()
+if dotenv_path.exists():
+    load_dotenv(dotenv_path)  # Local development
+    st.info("✅ Loaded local .env file.")
+else:
+    st.info("☁️ Using Streamlit Cloud secrets (no local .env found).")
 
-load_dotenv(dotenv_path)
-OPENAI_KEY = os.getenv("OPENAI_API_KEY")
-WEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
+# Load keys from environment or Streamlit secrets
+OPENAI_KEY = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
+WEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY") or st.secrets.get("OPENWEATHER_API_KEY")
 
 if not OPENAI_KEY:
-    st.error("⚠️ OpenAI API key not found in .env file.")
+    st.error("⚠️ OpenAI API key not found. Please set it in Streamlit Secrets or .env file.")
     st.stop()
 
 openai.api_key = OPENAI_KEY
@@ -143,13 +145,13 @@ if st.button("✨ Generate My Plan"):
         with st.spinner("Generating AI Itinerary..."):
             itinerary_text = generate_itinerary(destination, start_date, end_date, budget, interests, places, weather_summary)
 
-        # Display itinerary first
+        # Display itinerary
         st.subheader("🧭 Your Personalized Itinerary")
         st.markdown(itinerary_text)
 
         st.download_button("📥 Download Itinerary (TXT)", itinerary_text, file_name=f"{destination}_itinerary.txt")
 
-        # Display map last
+        # Display map
         st.markdown("---")
         st.subheader("🗺️ Explore the Destination")
         st.success(f"Found {len(places)} nearby places in {destination}!")
@@ -157,4 +159,3 @@ if st.button("✨ Generate My Plan"):
 
     except Exception as e:
         st.error(f"An error occurred: {e}")
-
