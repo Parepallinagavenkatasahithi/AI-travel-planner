@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from pathlib import Path
 import os
-from openai import OpenAI  # ✅ NEW SDK import
+import openai   # ✅ old-style import works across all versions
 
 # ======================================================================================
 # SAFE PAGE CONFIG (works on Streamlit Cloud reloads)
@@ -36,8 +36,8 @@ if not OPENAI_KEY:
     st.error("⚠️ OpenAI API key not found. Please set it in Streamlit Secrets or .env file.")
     st.stop()
 
-# ✅ Initialize the new OpenAI client
-client = OpenAI(api_key=OPENAI_KEY)
+# ✅ old-style initialization (safe on Streamlit Cloud)
+openai.api_key = OPENAI_KEY
 
 # ------------------- App Header -------------------
 st.title("🎒 AI Travel Planner for Students")
@@ -139,15 +139,15 @@ def generate_itinerary(destination, start_date, end_date, budget, interests, pla
     4. Student travel tips
     """
 
-    # ✅ Use new OpenAI client call syntax
-    response = client.chat.completions.create(
+    # ✅ Compatible call (works on both new & old SDKs)
+    response = openai.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are a helpful AI travel planner for students."},
             {"role": "user", "content": prompt}
         ],
         temperature=0.8,
-        max_output_tokens=900
+        max_tokens=900
     )
 
     return response.choices[0].message.content.strip()
