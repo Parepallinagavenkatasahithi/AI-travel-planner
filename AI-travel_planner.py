@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from pathlib import Path
 import os
-import openai
+from openai import OpenAI  # ✅ NEW SDK import
 
 # ======================================================================================
 # SAFE PAGE CONFIG (works on Streamlit Cloud reloads)
@@ -36,7 +36,8 @@ if not OPENAI_KEY:
     st.error("⚠️ OpenAI API key not found. Please set it in Streamlit Secrets or .env file.")
     st.stop()
 
-openai.api_key = OPENAI_KEY
+# ✅ Initialize the new OpenAI client
+client = OpenAI(api_key=OPENAI_KEY)
 
 # ------------------- App Header -------------------
 st.title("🎒 AI Travel Planner for Students")
@@ -62,16 +63,12 @@ with st.sidebar:
 # Helper: Fetch Places using OpenCage API (instead of OSM)
 # ======================================================================================
 def fetch_osm_places(destination, radius_km=5, limit=20):
-    """
-    Uses OpenCage Geocoding API to find destination coordinates and
-    generate sample nearby points for map visualization.
-    """
+    """Use OpenCage API to find coordinates and generate mock nearby POIs."""
     try:
         if not OPENCAGE_API_KEY:
             st.warning("No OpenCage API key found — skipping map lookup.")
             return None, []
 
-        # --- Get coordinates from OpenCage ---
         geo_url = f"https://api.opencagedata.com/geocode/v1/json?q={destination}&key={OPENCAGE_API_KEY}"
         geo_data = requests.get(geo_url, timeout=10).json()
 
@@ -82,7 +79,7 @@ def fetch_osm_places(destination, radius_km=5, limit=20):
         lat = geo_data["results"][0]["geometry"]["lat"]
         lon = geo_data["results"][0]["geometry"]["lng"]
 
-        # --- Generate mock nearby points for display ---
+        # Generate a few sample nearby points for map display
         places = []
         for i in range(min(limit, 10)):
             places.append({
@@ -142,14 +139,15 @@ def generate_itinerary(destination, start_date, end_date, budget, interests, pla
     4. Student travel tips
     """
 
-    response = openai.chat.completions.create(
+    # ✅ Use new OpenAI client call syntax
+    response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are a helpful AI travel planner for students."},
             {"role": "user", "content": prompt}
         ],
         temperature=0.8,
-        max_tokens=900
+        max_output_tokens=900
     )
 
     return response.choices[0].message.content.strip()
