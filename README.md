@@ -49,7 +49,7 @@ cd AI-travel-planner
 -streamlit run AI-travel_planner.py
 
 **Open your browser:**
-The app will run at http://localhost:8501
+The app will run at https://ai-travel--planner.streamlit.app/
 ______________________________________________________________________________________________
 **💡 How It Works**
 ->🏙️ Enter destination, dates, budget, and interests.
